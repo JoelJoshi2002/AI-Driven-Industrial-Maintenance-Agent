@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  # 1. THE DATABASE (Memory)
+  mariadb:
+    image: mariadb:10.6
+    container_name: industrial_sql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: industrial_secret_password
+      MYSQL_DATABASE: industrial_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: industrial_secret_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - factory_net
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      retries: 10
+
+  # 2. THE VECTOR STORE (Knowledge)
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: industrial_vector
+    restart: always
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+    networks:
+      - factory_net
+
+  # 3. THE BACKEND (Brain)
+  api:
+    build: .
+    container_name: industrial_api
+    command: uvicorn web.api:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=mariadb
+      - DB_USER=user
+      - DB_PASSWORD=industrial_secret_password
+      - DB_NAME=industrial_db
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - factory_net
+
+  # 4. THE FRONTEND (Face)
+  dashboard:
+    build: .
+    container_name: industrial_dashboard
+    command: streamlit run dashboard.py
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      # Point to the containers, not localhost
+      - DB_HOST=mariadb 
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000 # Inside the network, chroma is on 8000
+    depends_on:
+      - api
+    networks:
+      - factory_net
+
+  # 5. THE SIMULATOR (Heartbeat)
+  simulator:
+    build: .
+    container_name: industrial_simulator
+    # Automatically start the simulation
+    command: python -m scripts.sensor_stream
+    environment:
+      - DB_HOST=mariadb
+      - DB_USER=user
+      - DB_PASSWORD=industrial_secret_password
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - factory_net
+
+volumes:
+  mariadb_data:
+  chroma_data:
+
+networks:
+  factory_net:
+    driver: bridge

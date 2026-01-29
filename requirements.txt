@@ -1,0 +1,34 @@
+# Database
+mysql-connector-python==8.2.0
+sqlmodel>=0.0.14
+chromadb>=0.5.0
+
+# Environment
+python-dotenv
+
+# PDF Processing (for manual ingestion only)
+pypdf==3.17.4
+pymupdf>=1.23.0
+
+# AI/ML
+sentence-transformers==2.2.2
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-huggingface
+langchain-community
+langchain-groq
+langchain-text-splitters
+langchain-classic
+
+# Web Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+streamlit>=1.28.0
+requests>=2.31.0
+
+# Data Processing
+pandas>=2.0.0
+plotly>=5.17.0
+
+# Utilities
+pydantic>=2.0.0

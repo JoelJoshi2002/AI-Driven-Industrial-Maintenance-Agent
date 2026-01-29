@@ -1,0 +1,19 @@
+# Ignore Virtual Environment (Heavy binaries)
+venv/
+.venv/
+env/
+
+# Ignore Database Storage (Binary files)
+data/mariadb/
+data/chroma/
+
+# Ignore Python Cache
+__pycache__/
+*.pyc
+
+# Ignore Environment Variables (Security)
+.env
+
+# Ignore IDE settings
+.vscode/
+.idea/
