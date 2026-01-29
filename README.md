@@ -1,293 +1,244 @@
-# AI-Driven Industrial Maintenance Agent
+# 🏭 AI-Driven Industrial Maintenance Agent
 
 **Integrating IoT Telemetry with Retrieval-Augmented Generation (RAG) for Predictive Repair**
 
-## 🎯 Project Overview
+---
 
-An autonomous Industrial Maintenance Assistant that bridges the gap between **Structured Data** (live sensor readings from machinery) and **Unstructured Data** (technical repair manuals). The system monitors industrial assets in real-time, detects anomalies based on physics constraints, and instantly retrieves exact step-by-step repair protocols from manufacturer documentation without human intervention.
+## 📌 Overview
+
+This project implements an **autonomous Industrial Maintenance Assistant** that combines **real-time machine telemetry** with **unstructured technical documentation** to enable predictive diagnostics and guided repair.
+
+The system continuously monitors industrial assets, detects failures using **physics-based engineering constraints**, and retrieves **exact, step-by-step repair procedures** from manufacturer manuals using **Retrieval-Augmented Generation (RAG)** — all without human intervention.
+
+This project is designed as a realistic **Industrial IoT + AI system**, suitable for:
+
+- 🧪 Research & experimentation  
+- 🎓 Academic evaluation  
+- 🧑‍🏫 Technical demonstrations  
+- 🏗️ Industrial AI system design portfolios  
+
+---
 
 ## 🏗️ System Architecture
 
-The project is built on a **Microservices Architecture** deployable via Docker Compose:
+The system follows a **microservices architecture**, fully containerized using Docker and orchestrated via **Docker Compose**.
 
-- **The Brain (Backend)**: Python/FastAPI using LangChain for logic
-- **The Memory (Structured DB)**: MariaDB (SQL) to store machine status, sensor logs (RPM, Temperature, Torque), and audit history
-- **The Knowledge (Vector DB)**: ChromaDB to store chunked, semantic embeddings of Technical Manuals
-- **The Interface (Frontend)**: Streamlit dashboard for live monitoring and chat interaction
+### Core Components
+
+#### 🧠 The Brain (API)
+FastAPI backend exposing:
+- Live machine status
+- Historical sensor telemetry
+- Anomaly detection results
+
+#### ❤️ The Simulator (Heartbeat)
+Python service that:
+- Streams time-shifted CSV telemetry
+- Simulates realistic factory behavior
+
+#### 🗄️ The Memory (Structured Database)
+- MariaDB (SQL)
+- Stores real-time telemetry:
+  - RPM
+  - Temperature
+  - Torque
+  - Usage time
+
+#### 📚 The Knowledge (Vector Database)
+- ChromaDB
+- Stores semantic embeddings of technical manuals for RAG-based retrieval
+
+#### 🖥️ The Interface (Frontend)
+- Streamlit dashboard
+- Live analytics and interactive AI maintenance agent
+
+---
 
 ## ✨ Key Features
 
-### 1. Live Digital Twin & Monitoring
-- Reads from CSV log files mimicking real-time IoT streams
-- Time-shifting: Historical data processed as "live" events for demos
-- Live dashboard plotting Temperature, RPM, and Torque curves for multiple machines simultaneously
+### 🔁 1. Live Digital Twin & Monitoring
+- Time-shifted CSV replay simulates live industrial telemetry
+- Real-time plots for:
+  - 🌡️ Temperature
+  - ⚙️ RPM
+  - 🔩 Torque
+- Concurrent monitoring of 10+ machines
 
-### 2. Intelligent Anomaly Detection
-The Agent autonomously analyzes sensor values against defined thresholds:
-- **Thermal Runaway**: Detected if Temp drops < 190°C while printing
-- **Fan Failure**: Detected if RPM = 0 during operation
-- **Motor Strain**: Detected if Torque > Normal Limit
-- **Temperature Anomalies**: Outside normal operating range (300-315K)
-- **Tool Wear Warnings**: Exceeds recommended limits
+---
 
-### 3. RAG-Based Diagnostics (The Core Innovation)
-- **Strict Persona**: The AI acts as a "Senior Field Engineer" - never says "Read the manual"
-- **Workflow**:
-  1. **Analyze**: Confirm the error using SQL sensor data
-  2. **Retrieve**: Search the Vector DB for specific error codes (e.g., "Extruder Fan Error")
-  3. **Instruct**: Output verbatim step-by-step repair instructions, including tool sizes and safety warnings
+### 📐 2. Physics-Based Anomaly Detection
 
-### 4. Lifecycle Support
-The Agent handles three distinct user intents:
-- **Maintenance**: Reactive repair (Checks Sensors first)
-- **Commissioning**: Setup/Calibration guides (Skips Sensors, checks Manual)
-- **Safety**: Compliance and specs (Skips Sensors, checks Manual)
+Failures are detected using deterministic engineering constraints, ensuring full explainability:
 
-### 5. Real-Time Monitoring & Analytics
-- **Live Dashboard**: Multi-machine sensor visualization
-- **Anomaly Tracking**: Real-time detection and alerting
-- **Historical Analysis**: Trend analysis across multiple machines
+| Failure Type      | Condition                                   |
+|-------------------|---------------------------------------------|
+| 🔥 Thermal Failure | Temperature < 190 °C while printing         |
+| 🌀 Fan Failure     | RPM = 0 while machine is active             |
+| 💪 Motor Strain    | Torque > 60 Nm                              |
+| ⏳ Tool Wear       | Usage time > 200 minutes                    |
 
-## 🛠️ Technical Stack
+✅ No black-box ML  
+✅ Fully interpretable diagnostics  
 
-- **Language**: Python 3.9+
-- **Containerization**: Docker & Docker Compose
-- **AI/LLM**: LangChain, Groq (Llama3/Mixtral), HuggingFace Embeddings (bge-base-en-v1.5)
-- **Databases**: MariaDB (SQL), ChromaDB (Vector)
-- **Frontend**: Streamlit
-- **Data Handling**: Pandas (CSV Replay), SQLModel (ORM)
-- **PDF Processing**: PyMuPDF (for manual ingestion only)
+---
 
-## 📋 Prerequisites
+### 🧠 3. RAG-Based Diagnostics
 
-- Docker and Docker Compose installed
-- Python 3.9+ (for local development)
-- Groq API Key (for LLM access)
-- Sensor data CSV file (AI4I dataset or similar)
+The AI agent behaves like a **Senior Field Engineer**:
 
-## 🚀 Quick Start
+- *“How do I…”* → Immediate manual lookup  
+- *“Machine X is broken”* → Sensor analysis → Manual retrieval  
 
-### 1. Clone and Setup
+Responses prioritize:
+- ⚠️ Safety warnings  
+- 🔌 Electrical risks  
+- 🔥 Thermal hazards  
+- ⚙️ Mechanical constraints  
 
-```bash
-git clone <repository-url>
-cd industrial-agent
+---
+
+## 📁 Project Structure
+
+```text
+industrial-agent/
+├── data/
+│   ├── printer_manual.pdf
+│   └── real_sensor_data.csv
+├── database/
+│   ├── models.py
+│   └── connection.py
+├── llm/
+│   ├── agent.py
+│   ├── tools.py
+│   └── anomaly_detector.py
+├── scripts/
+│   ├── ingest_vectors.py
+│   ├── sensor_stream.py
+│   ├── reset_data.py
+│   └── init.sql
+├── web/
+│   └── api.py
+├── dashboard.py
+├── Dockerfile
+├── docker-compose.yml
+└── requirements.txt
 ```
+## 🚀 Quick Start (Recommended)
 
-### 2. Environment Configuration
+### 1️⃣ Prerequisites
+- Docker  
+- Docker Compose  
+- Groq API Key  
 
-Create a `.env` file in the root directory:
+---
+
+### 2️⃣ Configuration
+
+Create a `.env` file in the project root:
 
 ```env
 GROQ_API_KEY=your_groq_api_key_here
 ```
-
-### 3. Start Infrastructure
-
-```bash
-docker-compose up -d mariadb chromadb
-```
-
-Wait for services to be healthy (check with `docker-compose ps`).
-
-### 4. Initialize Database
+## 🚀 Launch the System
 
 ```bash
-# Install Python dependencies (if not using Docker)
-pip install -r requirements.txt
-
-# Initialize database schema
-mysql -h localhost -u user -pindustrial_secret_password industrial_db < scripts/init.sql
+docker-compose up --build
 ```
+## 🔗 Access Points
 
-Or use Python:
+- **Dashboard:** http://localhost:8501  
+- **API Docs:** http://localhost:8000/docs  
+
+🟢 The simulator starts automatically and begins streaming data immediately.
+
+---
+
+## 💻 Local Development (Without Docker)
+
+### 1️⃣ Database Setup
+
+Ensure MariaDB/MySQL is running locally, then initialize tables:
 
 ```bash
-python -c "from database.connection import engine; from database.models import Machine, SensorLog; from sqlmodel import SQLModel; SQLModel.metadata.create_all(engine)"
+python -c "from database.connection import engine; from sqlmodel import SQLModel; SQLModel.metadata.create_all(engine)"
 ```
-
-### 5. Prepare Sensor Data
-
-Place your sensor data CSV file at `data/real_sensor_data.csv` (or `data/real_sensors.csv`).
-
-The CSV should have columns: Air Temp, Process Temp, RPM, Torque, Tool Wear, Target, and failure type flags.
-
-### 6. Ingest Technical Manual
-
-Place your technical manual PDF at `data/printer_manual.pdf`, then:
+### 2️⃣ Start Backend API
 
 ```bash
-python scripts/ingest_vectors.py
+uvicorn web.api:app --reload --port 8000
 ```
-
-**Note**: If you don't have a manual, you can create a sample one or use any technical documentation PDF. The system will chunk and embed it for RAG retrieval.
-
-### 7. Stream Sensor Data (Optional - for Demo)
-
-To simulate live sensor streaming:
+### 3️⃣ Start Telemetry Simulator
 
 ```bash
-# Stream at real-time speed
-python scripts/sensor_stream.py
-
-# Stream at 10x speed (faster demo)
-python scripts/sensor_stream.py 10
-
-# Resume from specific row
-python scripts/sensor_stream.py 1 500
+python -m scripts.sensor_stream
 ```
-
-### 8. Start FastAPI Backend
-
-```bash
-# Option 1: Using Docker
-docker-compose up api
-
-# Option 2: Local development
-uvicorn web.api:app --reload --host 0.0.0.0 --port 8000
-```
-
-### 9. Launch Streamlit Dashboard
-
+### 4️⃣ Launch Dashboard
 ```bash
 streamlit run dashboard.py
 ```
 
-The dashboard will be available at `http://localhost:8501`
+## 🛠️ Management Utilities
+### 🔄 Reset the Demo
+```bash
+python -m scripts.reset_data
+```
 
+### Docker alternative:
+
+```bash
+docker-compose down -v
+```
+
+##  📥 Ingest New Manuals
+
+### Replace:
+
+```bassh
+data/printer_manual.pdf
+```
+
+### Run:
+
+```bash
+python scripts/ingest_vectors.py
+```
 ## 🎬 Demo Flow (The "Golden" Test Case)
 
-### Scenario: Machine 3 reports RPM: 0
+Follow this sequence to demonstrate the full capabilities of the system:
 
-1. **User Asks**: "How do I fix Machine 3?"
+1.  **Launch the System:** Start the application (using Docker or manual scripts).
+2.  **Verify Telemetry:** Open the dashboard and confirm that the live graphs in the "Live Analytics" tab are updating.
+3.  **Wait for an Anomaly:** Watch the sidebar status indicators. Wait until a **🔥** icon appears next to a machine (e.g., Machine 4).
+4.  **Ask the Agent:** Switch to the Chat tab and ask:
+    > "Machine 4 is failing. What is the diagnosis and how do I fix it?"
 
-2. **System Response**:
-   - **Diagnosis**: Identifies "Fan Failure (FF-001)" based on 0 RPM detection
-   - **Retrieval**: Pulls relevant repair procedures from the Prusa Manual via RAG
-   - **Action**: Lists steps: 
-     - "1. Check for debris blocking the fan blades"
-     - "2. Verify cable connection to fan motor"
-     - "3. Test fan with multimeter..."
-   - **Safety**: Warnings about hotend temperature
+### 🤖 Agent Behavior
+Once asked, the Agent performs the following autonomous actions:
+* **Queries API:** It checks the live telemetry to validate the failure (e.g., confirms RPM is 0).
+* **Identifies Failure:** It diagnoses the specific issue (e.g., "Fan Failure").
+* **Retrieves Knowledge:** It searches the vector database to find the exact repair steps from the technical manual.
+* **Synthesizes Response:** It returns a set of actionable repair instructions complete with safety warnings.
 
-3. **Outcome**: User receives complete diagnostic and repair instructions directly in the chat interface
+## 🔧 Troubleshooting
 
-## 📁 Project Structure
+### ❌ ModuleNotFoundError
 
-```
-industrial-agent/
-├── data/                    # Data files (CSV, PDFs, database volumes)
-├── database/                # Database models and connection
-│   ├── models.py           # SQLModel definitions
-│   └── connection.py       # Database connection setup
-├── llm/                     # LLM agent and tools
-│   ├── agent.py            # LangChain agent executor
-│   ├── tools.py            # Agent tools (check status, lookup manual, scan)
-│   └── anomaly_detector.py # Autonomous anomaly detection
-├── scripts/                 # Utility scripts
-│   ├── init.sql            # Database schema
-│   ├── generate_data.py    # Data generation utilities
-│   ├── ingest_vectors.py   # PDF ingestion to ChromaDB
-│   └── sensor_stream.py    # CSV streaming simulator
-├── utils/                   # Utility modules
-├── web/                     # FastAPI backend
-│   └── api.py              # REST API endpoints
-├── dashboard.py             # Streamlit frontend
-├── docker-compose.yml       # Docker orchestration
-├── requirements.txt         # Python dependencies
-└── README.md               # This file
-```
+### Use module execution:
 
-## 🔧 Configuration
-
-### Ports
-- **FastAPI**: 8000
-- **ChromaDB**: 8001
-- **MariaDB**: 3306
-- **Streamlit**: 8501 (default)
-
-### Database Credentials
-- **User**: `user`
-- **Password**: `industrial_secret_password`
-- **Database**: `industrial_db`
-
-**⚠️ Change these in production!**
-
-## 🧪 Testing
-
-### Test Database Connection
 ```bash
-python check_connections.py
+python -m scripts.sensor_stream
 ```
 
-### Test Agent
-```bash
-python brain_test.py
+### ❌ Docker Connection Refused
+
+Use service names as hostnames inside Docker:
+
+```text
+ mariadb, api
 ```
 
-### Test API Endpoints
-```bash
-# Health check
-curl http://localhost:8000/
+### ❌ ChromaDB Port Issues
 
-# Get all machines status
-curl http://localhost:8000/machines/status
-
-# Get specific machine
-curl http://localhost:8000/machines/3
-```
-
-## 📊 Usage Examples
-
-### Chat Interface
-- "Check machine 3"
-- "How do I fix Machine 3?"
-- "What's wrong with all machines?"
-- "How do I calibrate the extruder?"
-- "What is the maximum operating temperature?"
-
-### Analytics Dashboard
-- Select multiple machines for comparison
-- View Temperature, RPM, and Torque trends
-- Real-time anomaly detection and visualization
-
-## 🐛 Troubleshooting
-
-### ChromaDB Connection Issues
-- Ensure ChromaDB is running: `docker-compose ps`
-- Check port mapping (should be 8001, not 8000)
-- Verify collection exists: Check `scripts/ingest_vectors.py` output
-
-### Database Connection Errors
-- Wait for MariaDB to fully initialize (check healthcheck)
-- Verify credentials match in `.env` and `docker-compose.yml`
-- Check network connectivity: `docker network ls`
-
-### Agent Not Responding
-- Verify Groq API key is set in `.env`
-- Check agent logs for errors
-- Ensure FastAPI is running and accessible
-
-
-## 🔐 Security Notes
-
-- **Never commit** `.env` files with API keys
-- Change default database passwords in production
-- Use environment variables for sensitive configuration
-- Implement authentication for production deployments
-
-## 📝 License
-
-[Your License Here]
-
-## 🤝 Contributing
-
-[Contributing Guidelines]
-
-## 📧 Contact
-
-[Your Contact Information]
-
----
-
-**Built with ❤️ for Industrial IoT and Predictive Maintenance**
+- Chroma runs internally on port **8000**
+- Exposed on host as port **8001**
+- Ensure `CHROMA_PORT` is configured correctly
